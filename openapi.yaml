@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 #this is based of https://www.traccar.org/api-reference/#tag/Commands/paths/~1commands~1%7Bid%7D/put
 # you can view in  https://redocly.github.io/redoc/ #se modifico el HTML imprimir la documentacion
 info:
@@ -7,7 +7,7 @@ info:
     Descripcion de API de Alto nivel para comunicacion de Ros  con UAV.
     some usefull link:
     - [Repositorio](https://github.com/alvcaballero/multiuav_gui/tree/react)
-  version: "2.3.1"
+  version: "2.3.5"
   contact:
     email: arpoma167@gmail.com
 externalDocs:
@@ -111,9 +111,9 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/Position"
+                  $ref: '#/components/schemas/Position'
   /loadmission/{id}:
-    put:
+    post:
       summary: Load mission to devices
       description: without any parameter,load the mission all UAV's
       tags:
@@ -123,6 +123,12 @@ paths:
         in: path
         schema:
           type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadMission'
+        required: true
       responses:
         '204':
           description: No Content
@@ -130,7 +136,7 @@ paths:
         
 
   /commandmission/{id}:
-    put:
+    post:
       summary: Command to exec mission
       description: without any parameter,load the mission all UAV's
       tags:
@@ -144,6 +150,25 @@ paths:
         '204':
           description: No Content
           content: {}
+
+  /sendTask/:
+    post:
+      summary: Send a task to GCS for UAVs inspection
+      description: without any parameter,load the mission all UAV's
+      tags:
+        - Missions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/task_msg'
+        required: true
+
+      responses:
+        '204':
+          description: No Content
+          content: {}
+
 
   /comands/send:
     post:
@@ -271,6 +296,154 @@ components:
               type: string
             alarm:
               type: string
+    LoadMission:
+      type: object
+      properties:
+        description:
+          type: string
+          example: "mapeado de linea electrica"
+        route:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+    Route:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "linea mata las cañas"
+        uav:
+          type: string
+          example: "uav_1"
+        wp:
+          type: array
+          items:
+            $ref: '#/components/schemas/mission_waypoint'
+        attributes:
+          type: object
+          properties:
+            mode_landing:
+              type: integer
+              example: 2
+            mode_yaw:
+              type: integer
+              example: 3
+            mode_gimba:
+              type: integer
+              example: 0
+            mode_trace:
+              type: integer
+              example: 0
+    
+    mission_waypoint:
+      type: object
+      properties:
+        pos:
+          type: array
+          items:
+            type: number
+          example: [37.53395183, -6.30202933, 10]
+          description: "latitude, longitude, altitud relativa al despege"
+          enum:
+            - latitude
+            - longitude
+            - altitud
+          minItems: 3
+          maxItems: 3
+        yaw:
+          type: number
+          example: 20
+        gimbal:
+          type: number
+          example: 45
+    task_msg:
+      type: object
+      properties:
+        misision_id:
+          type: integer
+          example: 1234
+          description: "identificador por GridWacth"
+        objectivo:
+          type: integer
+          example: 0
+          description: "Localizacion de incidencia 1: Inpecion de zona de aves, 2: Levantamiento Lidar"
+        loc:
+          type: object
+          properties:
+            tramo0:
+              type: array
+              items:
+                type: object
+                properties:
+                  lat:
+                    type: number
+                    example: 37.0199008980604
+                  lon:
+                    type: number
+                    example: -6.559872232408047
+              example:
+                - {lat: 37.121203,  lon: -6.492668 }
+                - {lat: 37.116616 , lon: -6.484771 }
+                - {lat: 37.107177 , lon: -6.479203 }
+            tramo1:
+              type: array
+              items:
+                type: object
+                properties:
+                  lat:
+                    type: number
+                    example: 37.0199008980604
+                  lon:
+                    type: number
+                    example: -6.559872232408047
+              example:
+                - {lat: 37.121100, lon: -6.495395 }
+                - {lat: 37.119171, lon: -6.496007 }
+        meteo:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                example: 37.01455061559604
+              lon:
+                type: number
+                example: -6.5625427378086489
+              wind_vel:
+                type: number
+                example: 12
+                description: "velocidad en metros/s"
+              temp:
+                type: number
+                example: 38
+                description: "temperatura en grados celcius"
+              humidity:
+                type: number
+                example: 90
+                description: "porcentaje "
+              pressure:
+                type: number
+                example: 1201
+                description: "presion atmosferica  en hPa"
+          example:
+            - lat: 37.01455061559604
+              lon: -6.5625427378086489
+              wind_vel: 12
+              wind_dir: 360
+              temp: 38
+              humidity: 90
+              pres_atm: 5
+            - lat: 37.01455061559604
+              lon: -6.5625427378086489
+              wind_vel: 12
+              wind_dir: 360
+              temp: 38
+              humidity: 90
+              pres_atm: 5
+
+
+
     Command:
       type: object
       properties:
