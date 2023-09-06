@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: "3.0.3"
 #this is based of https://www.traccar.org/api-reference/#tag/Commands/paths/~1commands~1%7Bid%7D/put
 # you can view in  https://redocly.github.io/redoc/ #se modifico el HTML imprimir la documentacion
 info:
@@ -35,16 +35,15 @@ tags:
 #  - name: Camera
 #    description: for future
 
-
 paths:
   /devices:
     get:
       tags:
-      - Devices
+        - Devices
       summary: Fetch a list of Devices
       description: Return the list of devices
       parameters:
-      - $ref: '#/components/parameters/token'
+        - $ref: "#/components/parameters/token"
       responses:
         200:
           description: (ok) list of devices
@@ -53,21 +52,21 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Device'
+                  $ref: "#/components/schemas/Device"
         400:
           description: No permission
           content: {}
     post:
       summary: Create a Device
       tags:
-      - Devices
+        - Devices
       parameters:
-      - $ref: '#/components/parameters/token'
+        - $ref: "#/components/parameters/token"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BodyAddUAV'
+              $ref: "#/components/schemas/BodyAddUAV"
         required: true
       responses:
         200:
@@ -75,22 +74,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BodyAddUAV'
+                $ref: "#/components/schemas/BodyAddUAV"
       x-codegen-request-body-name: body
-      
+
   /devices/{id}:
     delete:
       summary: Delete a Device
       tags:
-      - Devices
+        - Devices
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
-        '204':
+        "204":
           description: No Content
           content: {}
 
@@ -102,16 +101,16 @@ paths:
         returns a list of last known positions for all the user's Devices. _from_
         and _to_ fields are not required with _id_.
       tags:
-      - Positions
+        - Positions
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Position'
+                  $ref: "#/components/schemas/Position"
   /loadmission/{id}:
     post:
       summary: Load mission to devices
@@ -119,21 +118,20 @@ paths:
       tags:
         - Missions
       parameters:
-      - name: id
-        in: path
-        schema:
-          type: integer
+        - name: id
+          in: path
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoadMission'
+              $ref: "#/components/schemas/LoadMission"
         required: true
       responses:
-        '204':
+        "204":
           description: No Content
           content: {}
-        
 
   /commandmission/{id}:
     post:
@@ -142,12 +140,12 @@ paths:
       tags:
         - Missions
       parameters:
-      - name: id
-        in: path
-        schema:
-          type: integer
+        - name: id
+          in: path
+          schema:
+            type: integer
       responses:
-        '204':
+        "204":
           description: No Content
           content: {}
 
@@ -161,21 +159,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/task_msg'
+              $ref: "#/components/schemas/task_msg"
         required: true
 
       responses:
-        '204':
+        "204":
           description: No Content
           content: {}
-
 
   /comands/send:
     post:
       summary: Send command to devices
       description: Send command to  devices
       tags:
-      - Commands
+        - Commands
       requestBody:
         content:
           application/json:
@@ -183,22 +180,20 @@ paths:
               "$ref": "#/components/schemas/Command"
         required: true
       responses:
-        '200':
+        "200":
           description: Command sent
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Command"
-        '400':
-          description: Command no match 
+        "400":
+          description: Command no match
           content: {}
       x-codegen-request-body-name: body
 
-
-
 components:
   #responses:
-    
+
   parameters:
     token:
       name: token
@@ -207,7 +202,7 @@ components:
       required: false
       schema:
         type: string
-    
+
   schemas:
     BodyAddUAV:
       type: object
@@ -305,7 +300,7 @@ components:
         route:
           type: array
           items:
-            $ref: '#/components/schemas/Route'
+            $ref: "#/components/schemas/Route"
     Route:
       type: object
       properties:
@@ -318,7 +313,7 @@ components:
         wp:
           type: array
           items:
-            $ref: '#/components/schemas/mission_waypoint'
+            $ref: "#/components/schemas/mission_waypoint"
         attributes:
           type: object
           properties:
@@ -334,7 +329,7 @@ components:
             mode_trace:
               type: integer
               example: 0
-    
+
     mission_waypoint:
       type: object
       properties:
@@ -382,9 +377,9 @@ components:
                     type: number
                     example: -6.559872232408047
               example:
-                - {lat: 37.121203,  lon: -6.492668 }
-                - {lat: 37.116616 , lon: -6.484771 }
-                - {lat: 37.107177 , lon: -6.479203 }
+                - { lat: 37.121203, lon: -6.492668 }
+                - { lat: 37.116616, lon: -6.484771 }
+                - { lat: 37.107177, lon: -6.479203 }
             tramo1:
               type: array
               items:
@@ -397,8 +392,8 @@ components:
                     type: number
                     example: -6.559872232408047
               example:
-                - {lat: 37.121100, lon: -6.495395 }
-                - {lat: 37.119171, lon: -6.496007 }
+                - { lat: 37.121100, lon: -6.495395 }
+                - { lat: 37.119171, lon: -6.496007 }
         meteo:
           type: array
           items:
@@ -442,8 +437,6 @@ components:
               humidity: 90
               pres_atm: 5
 
-
-
     Command:
       type: object
       properties:
@@ -452,7 +445,7 @@ components:
         attributes:
           type: object
           properties: {}
-    
+
     Notification:
       type: object
       properties:
@@ -463,3 +456,32 @@ components:
         attributes:
           type: object
           properties: {}
+
+    resulMissionTask:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            uav:
+              type: string
+            points:
+              type: array
+        status:
+          type: string
+      example:
+        response:
+          uav: "uav_1"
+          points:
+            - [37.134092, -6.472401, 50]
+            - [37.121203, -6.492668, 50]
+            - [37.121203, -6.492668, 30]
+            - [37.116616, -6.484771, 30]
+            - [37.107177, -6.479203, 30]
+            - [37.107177, -6.479203, 50]
+            - [37.1211, -6.495395, 50]
+            - [37.1211, -6.495395, 30]
+            - [37.119171, -6.496007, 30]
+            - [37.119171, -6.496007, 50]
+            - [37.134092, -6.472401, 50]
+        status: "OK"
