@@ -163,9 +163,12 @@ paths:
         required: true
 
       responses:
-        "204":
-          description: No Content
-          content: {}
+        "200":
+          description: planned route
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/resulMissionTask"
 
   /comands/send:
     post:
@@ -338,7 +341,7 @@ components:
           items:
             type: number
           example: [37.53395183, -6.30202933, 10]
-          description: "latitude, longitude, altitud relativa al despege"
+          description: "latitude, longitude, relative altitude at takeoff"
           enum:
             - latitude
             - longitude
@@ -465,10 +468,25 @@ components:
           properties:
             uav:
               type: string
+              description: device identifier
             points:
               type: array
+              description: List de points with "latitude, longitude, relative altitude at takeoff"
+              items:
+                type: array
+                items:
+                  type: number
+                example: [37.53395183, -6.30202933, 10]
+                description: "latitude, longitude, relative altitude at takeoff"
+                enum:
+                  - latitude
+                  - longitude
+                  - altitud
+                minItems: 3
+                maxItems: 3
         status:
           type: string
+          description: status of planing
       example:
         response:
           uav: "uav_1"

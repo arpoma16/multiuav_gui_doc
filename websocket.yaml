@@ -1,21 +1,22 @@
-asyncapi: 2.6.0
+asyncapi: "2.6.0"
 #souce https://www.asyncapi.com/blog/websocket-part1
 # visualizador https://redocly.github.io/redoc/
 # generar la documentacion https://github.com/asyncapi/html-template
 info:
   title: GCS Websockets API for multiUAV
-  version: 1.8.0
+  version: "1.8.0"
   description: >
     Ademas de la  REST API, la GCS posee un punto de acceso final WebSocket para
-    actualizaciones en directo. 
-  #  La cookie de sesión es la única opción de autorización para la conexión WebSocket. 
+    actualizaciones en directo.
+  #  La cookie de sesión es la única opción de autorización para la conexión WebSocket.
 
 servers:
   public:
-    url: 'localhost:4000/api/socket'
-    protocol: wss
+    url: "localhost:4000/api/socket"
+    protocol: ws
     description: |
       Servidor publico disponible sin autenticacion
+defaultContentType: application/json
 channels:
   /:
     subscribe:
@@ -23,18 +24,24 @@ channels:
       operationId: sendMessage
       message:
         oneOf:
-          - $ref: '#/components/messages/update'
+          - $ref: "#/components/messages/update"
 components:
   messages:
     update:
-      summary: 'array con serverstate,  device and positions'
+      summary: "Objeto json con elementos serverstate,  device and positions"
       description: >-
-        elemento del array contiene un objeto tipo Json de devices, positions.Si
+        En el caso de las propiedades device y position cada propiedad contiene un array de elementos de su tipo.Si
         un mensaje no contiene ningún objeto de un determinado tipo, la key no
         se incluirá en la estructura JSON. En la mayoría de los casos, un
         mensaje contiene un único tipo de objetos.
       payload:
-        $ref: '#/components/schemas/update'
+        $ref: "#/components/schemas/update"
+      examples:
+        - payload:
+            devices:
+            Position:
+            RosState: true
+
   schemas:
     update:
       type: object
@@ -42,11 +49,11 @@ components:
         devices:
           type: array
           items:
-            $ref: '#/components/schemas/Device'
+            $ref: "#/components/schemas/Device"
         position:
           type: array
           items:
-            $ref: '#/components/schemas/Position'
+            $ref: "#/components/schemas/Position"
         RosState:
           type: boolean
     Device:
@@ -60,7 +67,7 @@ components:
           type: string
         lastUpdate:
           type: string
-          description: 'in IS0 8601 format. eg. `1963-11-22T18:30:00Z`'
+          description: "in IS0 8601 format. eg. `1963-11-22T18:30:00Z`"
           format: date-time
         category:
           type: string
@@ -71,7 +78,7 @@ components:
           type: integer
         deviceTime:
           type: string
-          description: 'in IS0 8601 format. eg. `1963-11-22T18:30:00Z`'
+          description: "in IS0 8601 format. eg. `1963-11-22T18:30:00Z`"
           format: date-time
         latitude:
           type: number
