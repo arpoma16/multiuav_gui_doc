@@ -1,27 +1,113 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>MUAV-MT</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>MUAV-my</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
 
-  <style>
-    html, body
-    {
-    height: 100%;
-    }
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
 
-  </style>
-</head>
-<body>
-<h1 style="text-align: center;">Documentation of GCS MUAV</h1>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-
-<div id="main" class="container" style="display: flex;"></div>
-    <button onclick="location.href='api.html'" class="btn btn-info btn-lg btn-block btn-huge" style="width: 49%;height: 30%;display: inline-block;">API</button>
-    <button onclick="location.href='websocket/index.html'" class="btn btn-warning btn-lg btn-block btn-huge" style="width: 49%;height: 30%;display: inline-block;">Websocket</button>
-</div> 
-<img class="rounded mx-auto d-block" src="logo_grvc.png" />
-</body>
+    <header>
+      <img class="rounded mx-auto d-block" src="logo_grvc.png" />
+      <h1 style="text-align: center">Documentation MUAV - GCS</h1>
+    </header>
+    <main class="flex-shrink-0">
+      <div class="container my-5">
+        <a
+          class="entry-link"
+          aria-label="post link to Installation | Update"
+          href="api.html"
+        >
+          <div class="bg-body-tertiary p-4 rounded">
+            <h2>API DOC</h2>
+            <p>Resources and methos of api</p>
+            <p>
+              <span title="2021-01-20 00:00:00 +0000 UTC"
+                >September 21, 2023</span
+              >
+            </p>
+          </div>
+        </a>
+      </div>
+      <div class="container my-5">
+        <a
+          class="entry-link"
+          aria-label="post link to Installation | Update"
+          href="websocket/index.html"
+        >
+          <div class="bg-body-tertiary p-4 rounded">
+            <h2>Websocket DOC</h2>
+            <p>Read Install and Update instructions here</p>
+            <p>
+              <span title="2021-01-20 00:00:00 +0000 UTC">August 2, 2023</span>
+            </p>
+          </div>
+        </a>
+      </div>
+      <div class="container my-5">
+        <a
+          class="entry-link"
+          aria-label="post link to Installation | Update"
+          href="api.html"
+        >
+          <div class="bg-body-tertiary p-4 rounded">
+            <h2>Video Streaming</h2>
+            <p>Read Install and Update instructions here</p>
+            <p>
+              <span title="2021-01-20 00:00:00 +0000 UTC"
+                >September 25, 2023</span
+              >
+            </p>
+          </div>
+        </a>
+      </div>
+      <div class="container my-5">
+        <a
+          class="entry-link"
+          aria-label="post link to Installation | Update"
+          href="api.html"
+        >
+          <div class="bg-body-tertiary p-4 rounded">
+            <h2>Device integration</h2>
+            <p>this</p>
+            <p>
+              <span title="2021-01-20 00:00:00 +0000 UTC"
+                >September 26, 2023</span
+              >
+              Alvaro Poma
+            </p>
+          </div>
+        </a>
+      </div>
+    </main>
+    <footer class="footer my-auto py-3 bg-body-tertiary border-top">
+      <div class="container">
+        <span class="text-body-secondary"
+          >Project Management tool for multi UAV sistem using ROS.</span
+        >
+      </div>
+    </footer>
+  </body>
 </html>

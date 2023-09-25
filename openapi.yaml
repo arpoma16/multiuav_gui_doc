@@ -50,9 +50,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Device"
+                $ref: "#/components/schemas/ListDevice"
         400:
           description: No permission
           content: {}
@@ -93,7 +91,7 @@ paths:
           description: No Content
           content: {}
 
-  /postitions:
+  /positions:
     get:
       summary: Fetches a list of Positions
       description: We strongly recommend using Websocket
@@ -108,9 +106,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Position"
+                $ref: "#/components/schemas/ListPosition"
+
   /loadmission/{id}:
     post:
       summary: Load mission to devices
@@ -119,6 +116,7 @@ paths:
         - Missions
       parameters:
         - name: id
+          required: true
           in: path
           schema:
             type: integer
@@ -141,6 +139,7 @@ paths:
         - Missions
       parameters:
         - name: id
+          required: true
           in: path
           schema:
             type: integer
@@ -215,6 +214,29 @@ components:
         uav_type:
           type: string
 
+    ListDevice:
+      type: array
+      items:
+        $ref: "#/components/schemas/Device"
+      example:
+        - id: "0"
+          name: "uav_2"
+          category: "dji"
+          ip: "10.42.0.43"
+          camera:
+            - type: "WebRTC"
+              source: "main"
+          status: "offline"
+          lastUpdate: null
+        - id: "1"
+          name: "uav_4"
+          category: "dji_M300"
+          ip: "10.42.0.44"
+          camera:
+            - type: "WebRTC"
+              source: "main"
+          status: "offline"
+
     Device:
       type: object
       properties:
@@ -228,14 +250,26 @@ components:
           type: string
           description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
           format: date-time
-        #model:
-        #  type: string
+        ip:
+          type: string
         category:
           type: string
-        #attributes:
-        #  type: object
-        #  properties: {}
-
+        camera:
+          type: array
+          items:
+            type: object
+            properties:
+              types:
+                type: string
+              source:
+                type: string
+            example:
+              - { type: "WebRTC", source: "main" }
+              - { type: "WebRTC", source: "fpv" }
+    ListPosition:
+      type: array
+      items:
+        $ref: "#/components/schemas/Position"
     Position:
       type: object
       properties:
@@ -282,6 +316,10 @@ components:
         attributes:
           type: object
           properties:
+            batery:
+              type: number
+            gimbal:
+              type: number
             protocol:
               type: string
             mission_state:
