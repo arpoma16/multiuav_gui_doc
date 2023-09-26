@@ -36,11 +36,6 @@ components:
         mensaje contiene un único tipo de objetos.
       payload:
         $ref: "#/components/schemas/update"
-      examples:
-        - payload:
-            devices:
-            Position:
-            RosState: true
 
   schemas:
     update:
@@ -56,6 +51,13 @@ components:
             $ref: "#/components/schemas/Position"
         RosState:
           type: boolean
+      #example:
+      #  devices:
+      #    -
+      #  Position:
+      #    -
+      #  RosState: true
+
     Device:
       type: object
       properties:
@@ -69,8 +71,22 @@ components:
           type: string
           description: "in IS0 8601 format. eg. `1963-11-22T18:30:00Z`"
           format: date-time
+        ip:
+          type: string
         category:
           type: string
+        camera:
+          type: array
+          items:
+            type: object
+            properties:
+              types:
+                type: string
+              source:
+                type: string
+            example:
+              - { type: "WebRTC", source: "main" }
+              - { type: "WebRTC", source: "fpv" }
     Position:
       type: object
       properties:
@@ -94,6 +110,10 @@ components:
         attributes:
           type: object
           properties:
+            batery:
+              type: number
+            gimbal:
+              type: number
             protocol:
               type: string
             mission_state:
