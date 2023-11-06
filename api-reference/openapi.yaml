@@ -20,10 +20,10 @@ tags:
     description: Management of UAV-devices
   - name: Positions
     description: Obtains raw data from the UAV
-  - name: Missions
-    description: Management the mission
   - name: Commands
     description: Send command the UAV
+  - name: Commands_type_explain
+    description: how send command the UAV using command/send post API
 #  - name: Events
 #    description: Obtiene informacion de eventos
 #  - name: Notifications
@@ -108,68 +108,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/ListPosition"
 
-  /loadmission/{id}:
-    post:
-      summary: Load mission to devices
-      description: without any parameter,load the mission all UAV's
+  /comands/send:
+    get:
+      summary: Fetches a list of avaliable commands
+      description: list of avaliable command
       tags:
-        - Missions
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoadMission"
-        required: true
-      responses:
-        "204":
-          description: No Content
-          content: {}
-
-  /commandmission/{id}:
-    post:
-      summary: Command to exec mission
-      description: without any parameter,load the mission all UAV's
-      tags:
-        - Missions
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: No Content
-          content: {}
-
-  /sendTask/:
-    post:
-      summary: Send a task to GCS for UAVs inspection
-      description: without any parameter,load the mission all UAV's
-      tags:
-        - Missions
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/task_msg"
-        required: true
-
+        - Commands
       responses:
         "200":
-          description: planned route
+          description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/resulMissionTask"
-
-  /comands/send:
+                $ref: "#/components/schemas/listcommands"
     post:
       summary: Send command to devices
       description: Send command to  devices
@@ -192,6 +143,77 @@ paths:
           description: Command no match
           content: {}
       x-codegen-request-body-name: body
+
+  /commands/sendTask:
+    post:
+      summary: Send a task to GCS for UAVs inspection
+      description: without any parameter,load the mission all UAV's
+      tags:
+        - Commands
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task_msg"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/resulMissionTask"
+  /loadmission:
+    post:
+      summary: Load Mission
+      description: explaint type command load mission
+      tags:
+        - Commands_type_explain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoadMission"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+
+  /commandmission:
+    post:
+      summary: Command Mission
+      description: explaint type command command mission
+      tags:
+        - Commands_type_explain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/commandmission"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+
+  /gimbal:
+    post:
+      summary: Command Gimbal
+      description: explaint type command Gimbal
+      tags:
+        - Commands_type_explain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Gimbal"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
 
 components:
   #responses:
@@ -335,13 +357,57 @@ components:
     LoadMission:
       type: object
       properties:
-        description:
+        deviceId:
+          type: number
+          description: "Id of UAV or value of -1 for send all "
+          example: 1
+        type:
           type: string
-          example: "mapeado de linea electrica"
-        route:
+          description: "loadMission"
+          example: "loadMission"
+        attributes:
           type: array
+          description: "list of routes"
           items:
             $ref: "#/components/schemas/Route"
+    commandmission:
+      type: object
+      properties:
+        deviceId:
+          type: number
+          description: "Id of UAV or value of -1 for send all "
+          example: 1
+        type:
+          type: string
+          description: "commandMission"
+          example: "commandMission"
+    Gimbal:
+      type: object
+      properties:
+        deviceId:
+          type: number
+          description: "Id of UAV or value of -1 for send all "
+          example: 1
+        type:
+          type: string
+          description: "loadMission"
+          example: "loadMission"
+        attributes:
+          type: object
+          properties:
+            pitch:
+              type: number
+              description: "number of -180 to 180 degree"
+              example: -90
+            yaw:
+              type: number
+              description: "number of -180 to 180 degree"
+              example: 0
+            roll:
+              type: number
+              description: "number of -180 to 180 degree"
+              example: 0
+
     Route:
       type: object
       properties:
@@ -477,15 +543,146 @@ components:
               temp: 38
               humidity: 90
               pres_atm: 5
+    listcommands:
+      type: array
+      items:
+        type: string
+      example:
+        - threat
+        - loadMission
+        - commandMission
+        - threat
+        - SincroniseFiles
+        - ResumeMission
+        - Gimbal
 
     Command:
       type: object
       properties:
         deviceId:
           type: integer
+        type:
+          type: string
         attributes:
           type: object
           properties: {}
+      example:
+        deviceId: -1
+        type: "loadMission"
+        attributes:
+          - uav: uav_2
+            wp:
+              - pos:
+                  - 38.13898041
+                  - -3.17466429
+                  - 9
+                action:
+                  video_start: 0
+                  gimbal: -90
+                  yaw: 153.6
+              - pos:
+                  - 38.13898041
+                  - -3.17466429
+                  - 30
+                action:
+                  gimbal: -90
+                  yaw: 153.6
+              - pos:
+                  - 38.13816516
+                  - -3.17414854
+                  - 29.188751
+                action:
+                  gimbal: -90
+                  yaw: -110.8
+              - pos:
+                  - 38.13785254
+                  - -3.17518588
+                  - 26.939178
+                action:
+                  gimbal: -90
+                  yaw: -110.8
+            attributes:
+              mode_landing: 2
+              mode_yaw: 2
+              mode_gimbal: 0
+              idle_vel: 7
+          - uav: uav_1
+            wp:
+              - pos:
+                  - 38.13921488
+                  - -3.17343119
+                  - 9
+                action:
+                  video_start: 0
+                  gimbal: -45
+                  yaw: 83.4
+              - pos:
+                  - 38.13921488
+                  - -3.17343119
+                  - 30
+                action:
+                  gimbal: -45
+                  yaw: 83.4
+              - pos:
+                  - 38.13954244
+                  - -3.16989962
+                  - 32.601624
+                action:
+                  gimbal: -45
+                  yaw: 160.7
+              - pos:
+                  - 38.13984488
+                  - -3.1688074
+                  - 35.070221
+                action:
+                  gimbal: -45
+                  yaw: 160.9
+              - pos:
+                  - 38.13921488
+                  - -3.17343119
+                  - 15
+                action:
+                  video_stop: 0
+            attributes:
+              mode_landing: 0
+              mode_yaw: 2
+              mode_gimbal: 0
+              idle_vel: 7
+          - uav: uav_33
+            wp:
+              - pos:
+                  - 38.13889480850935
+                  - -3.1750557387829303
+                  - 9
+                action:
+                  video_start: 0
+                  gimbal: -90
+                  yaw: -112.3
+              - pos:
+                  - 38.14194543
+                  - -3.16625177
+                  - 111.046204
+                action:
+                  gimbal: -90
+                  yaw: -126.5
+              - pos:
+                  - 38.14030573
+                  - -3.16905065
+                  - 105.457245
+                action:
+                  gimbal: -90
+                  yaw: -105.9
+              - pos:
+                  - 38.13968243253984
+                  - -3.171996373829245
+                  - 100
+                action:
+                  video_stop: 0
+            attributes:
+              mode_landing: 2
+              mode_yaw: 2
+              mode_gimbal: 0
+              idle_vel: 5
 
     Notification:
       type: object
