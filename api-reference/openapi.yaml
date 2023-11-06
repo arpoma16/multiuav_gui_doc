@@ -325,7 +325,7 @@ components:
           type: number
         speed:
           type: number
-          description: in knots
+          description: in metres/s
         course:
           type: number
         #address:
@@ -341,9 +341,11 @@ components:
             batery:
               type: number
             gimbal:
-              type: number
-            protocol:
-              type: string
+              type: array
+              description: array with 3 element  yaw pich roll
+              example: [0, -90, 40]
+            #protocol:
+            #  type: string
             mission_state:
               type: string
             wp_reached:
@@ -426,12 +428,14 @@ components:
           properties:
             mode_landing:
               type: integer
+              description: 2 gps autolanding
               example: 2
             mode_yaw:
               type: integer
               example: 3
-            mode_gimba:
+            mode_gimbal:
               type: integer
+              description: 0 free and 1 mission ( using 0 for move with actions)
               example: 0
             mode_trace:
               type: integer
