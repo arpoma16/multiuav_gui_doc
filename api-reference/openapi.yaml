@@ -323,15 +323,17 @@ components:
           type: number
         altitude:
           type: number
+          description: in meters
         speed:
           type: number
           description: in metres/s
         course:
           type: number
+          description: value of -180 to 180 degrees
         #address:
         #  type: string
-        #accuracy:
-        #  type: number
+        accuracy:
+          type: number
         #network:
         #  type: object
         #  properties: {}
@@ -344,18 +346,35 @@ components:
               type: array
               description: array with 3 element  yaw pich roll
               example: [0, -90, 40]
+            obstacle_info:
+              type: array
+              description: List of values of distance sensor in device [down,front,rigth,back,left, up ]
+              example: [10, 30, 100, 100, 100, 20]
+            takeoff_height:
+              type: number
+              example: 480
             #protocol:
             #  type: string
             mission_state:
               type: string
+              description: can take values like ready, missionload, in_mission, finish_mission
+              example: missionload
             wp_reached:
               type: integer
+              description: number of waypoint of device arrived
+              example: 0
             uav_state:
               type: string
+              description: take values like multirotor, plane, transition
+              example: multirotor
             landed_state:
               type: string
+              description: take values like stop, ON_GROUND , IN_AIR
+              example: IN_AIR
             alarm:
               type: string
+              description: take values like UNDEFINED, threat
+              example: threat
     LoadMission:
       type: object
       properties:
