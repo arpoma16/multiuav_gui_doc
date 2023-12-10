@@ -24,6 +24,15 @@ tags:
     description: Send command the UAV
   - name: Commands_type_explain
     description: how send command the UAV using command/send post API
+  - name: Missions
+    description: all about the mission of UAV
+  - name: Files
+    description: Files of result mission
+  - name: ROS
+    description: tool for  get information of topics and services of ROS
+  - name: Utils
+    description: configuration form onboard computer of UAV
+
 #  - name: Events
 #    description: Obtiene informacion de eventos
 #  - name: Notifications
@@ -144,12 +153,26 @@ paths:
           content: {}
       x-codegen-request-body-name: body
 
-  /commands/sendTask:
+  /missions/:
+    get:
+      summary: Get Current mission
+      description: Return the currente mission
+      tags:
+        - Missions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getmission"
+
+  /missions/sendTask:
     post:
       summary: Send a task to GCS for UAVs inspection
       description: without any parameter,load the mission all UAV's
       tags:
-        - Commands
+        - Missions
       requestBody:
         content:
           application/json:
@@ -164,6 +187,87 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/resulMissionTask"
+  /files/routes/:
+    get:
+      summary: list of files
+      description: Return an array with the files of result of mission
+      tags:
+        - Files
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listFiles"
+
+  /files/download/{filename*}:
+    get:
+      summary: Donwload file
+      description: Donwload files
+      tags:
+        - Files
+      parameters:
+        - in: path
+          name: filename
+          schema:
+            type: string
+            example: "mission_1241/uav_15/DJI_20231124132054_0002_WIDE.jpg"
+          required: true
+          description: direction of file
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+
+  /ros/topics:
+    get:
+      summary: Topics
+      description: list of topics
+      tags:
+        - ROS
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listTopics"
+  /ros/services:
+    get:
+      summary: services
+      description: list of services in ROS
+      tags:
+        - ROS
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listServices"
+  /utils/datetime:
+    get:
+      summary: Get date time of GCS
+      description: return date time for update datetime of UAVs.
+      tags:
+        - Utils
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  datetime:
+                    type: string
+                    description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+                    format: date-time
   /loadmission:
     post:
       summary: Load Mission
@@ -481,14 +585,41 @@ components:
         gimbal:
           type: number
           example: 45
+
+    getmission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1234
+        uav:
+          type: array
+          items:
+            type: object
+            properties:
+              uav:
+                type: string
+                example: "uav_2"
+              status:
+                type: string
+                example: "init"
+        route:
+          type: array
+          items:
+            $ref: "#/components/schemas/Route"
+        initTime:
+          type: string
+          description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+          format: date-time
+
     task_msg:
       type: object
       properties:
-        misision_id:
+        mission_id:
           type: integer
           example: 1234
           description: "identificador por GridWacth"
-        objectivo:
+        objetivo:
           type: integer
           example: 0
           description: "Localizacion de incidencia 1: Inpecion de zona de aves, 2: Levantamiento Lidar"
@@ -566,6 +697,42 @@ components:
               temp: 38
               humidity: 90
               pres_atm: 5
+    listFiles:
+      type: array
+      items: string
+      example:
+        - "mission_1241/uav_15/DJI_20231124132052_0002_THRM_process.jpg"
+        - "mission_1241/uav_15/DJI_20231124132054_0002_WIDE.jpg"
+        - "mission_1241/uav_15/DJI_20231124132054_0002_ZOOM.jpg"
+        - "mission_1242/uav_15/DJI_20231124131954_0001_THRM.jpg"
+        - "mission_1242/uav_15/DJI_20231124131954_0001_THRM_process.jpg"
+
+    listTopics:
+      type: array
+      items: string
+      example:
+        - /rosout
+        - /rosout_agg
+        - /uav_2/dji_control/velocity
+        - /uav_2/dji_osdk_ros/acceleration_ground_fused
+        - /uav_2/dji_osdk_ros/angular_velocity_fused
+        - /uav_2/dji_osdk_ros/attitude
+        - /uav_2/dji_osdk_ros/battery_state
+        - /uav_2/dji_osdk_ros/camera_h264_stream
+        - /uav_2/dji_osdk_ros/display_mode
+        - /uav_2/dji_osdk_ros/flight_anomaly
+        - /uav_2/dji_osdk_ros/flight_status
+
+    listServices:
+      type: array
+      items: string
+      example:
+        - /rosout/get_loggers
+        - /rosout/set_logger_level
+        - /uav_2/camera_record_video_action
+        - /uav_2/camera_start_shoot_aeb_photo
+        - /uav_2/camera_start_shoot_burst_photo
+
     listcommands:
       type: array
       items:
