@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <h1>Mission Inspection State Machine in GCS</h1>
+    <pre class="mermaid">
+      stateDiagram-v2
+          [*] --> Planing: Envio de mission a GCS
+          Planing  -->  LoadMission 
+          LoadMission --> CommandMission : mission loaded
+          returntohome --> donwloadFiles : landing
+          state Error <<join>>
+          CommandMission --> Error : failt
+          LoadMission --> Error : failt
+          CommandMission --> Doing : mission commanded
+          Error --> resetuav
+          resetuav --> LoadMission
+          Doing --> donwloadFiles : recive finish mission
+           Doing --> returntohome : recive cancel mission
+          donwloadFiles  --> donwloadFilesgcs : recive finish donwload
+          donwloadFilesgcs  --> [*] 
+          resetuav --> [*] : into resertuav 2 times
+    </pre>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    </script>
+  </body>
+</html>
