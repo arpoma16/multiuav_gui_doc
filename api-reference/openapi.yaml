@@ -563,6 +563,10 @@ components:
             mode_trace:
               type: integer
               example: 0
+            idle_vel:
+              type: number
+              description: speed of vehicle
+              example: 7
 
     mission_waypoint:
       type: object
@@ -585,6 +589,25 @@ components:
         gimbal:
           type: number
           example: 45
+        action:
+          type: object
+          description: if don't put any  get de default value
+          properties:
+            video_start:
+              type: number
+              example: 0
+            gimbal:
+              type: number
+              example: value of 0 to -90
+            yaw:
+              type: number
+              example: value of 0 to -90
+            video_stop:
+              type: number
+              example: value of 0
+            photo:
+              type: number
+              example: value of 0
 
     getmission:
       type: object
@@ -622,39 +645,36 @@ components:
         objetivo:
           type: integer
           example: 0
-          description: "Localizacion de incidencia 1: Inpecion de zona de aves, 2: Levantamiento Lidar"
+          description: "0: Localizacion de incidencia 1: Inpecion de zona de aves, 2: Levantamiento Lidar"
         loc:
-          type: object
-          properties:
-            tramo0:
-              type: array
-              items:
-                type: object
-                properties:
-                  lat:
-                    type: number
-                    example: 37.0199008980604
-                  lon:
-                    type: number
-                    example: -6.559872232408047
-              example:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              geo_points:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    lat:
+                      type: number
+                      example: 37.0199008980604
+                    lon:
+                      type: number
+                      example: -6.559872232408047
+          example:
+            - name: tramo0
+              geo_points:
                 - { lat: 37.121203, lon: -6.492668 }
                 - { lat: 37.116616, lon: -6.484771 }
                 - { lat: 37.107177, lon: -6.479203 }
-            tramo1:
-              type: array
-              items:
-                type: object
-                properties:
-                  lat:
-                    type: number
-                    example: 37.0199008980604
-                  lon:
-                    type: number
-                    example: -6.559872232408047
-              example:
-                - { lat: 37.121100, lon: -6.495395 }
-                - { lat: 37.119171, lon: -6.496007 }
+            - name: tramo1
+              geo_points:
+                - { lat: 37.121203, lon: -6.492668 }
+                - { lat: 37.116616, lon: -6.484771 }
+                - { lat: 37.107177, lon: -6.479203 }
         meteo:
           type: array
           items:
@@ -888,43 +908,52 @@ components:
     resulMissionTask:
       type: object
       properties:
-        response:
-          type: object
-          properties:
-            uav:
-              type: string
-              description: device identifier
-            points:
-              type: array
-              description: List de points with "latitude, longitude, relative altitude at takeoff"
-              items:
-                type: array
-                items:
-                  type: number
-                example: [37.53395183, -6.30202933, 10]
-                description: "latitude, longitude, relative altitude at takeoff"
-                enum:
-                  - latitude
-                  - longitude
-                  - altitud
-                minItems: 3
-                maxItems: 3
+        mission_id:
+          type: integer
+          example: 1234
+        route:
+          type: array
+          items:
+            $ref: "#/components/schemas/Route"
+
         status:
           type: string
-          description: status of planing
+          description: status of planing, fail  don't cant calculate
       example:
         response:
-          uav: "uav_1"
-          points:
-            - [37.134092, -6.472401, 50]
-            - [37.121203, -6.492668, 50]
-            - [37.121203, -6.492668, 30]
-            - [37.116616, -6.484771, 30]
-            - [37.107177, -6.479203, 30]
-            - [37.107177, -6.479203, 50]
-            - [37.1211, -6.495395, 50]
-            - [37.1211, -6.495395, 30]
-            - [37.119171, -6.496007, 30]
-            - [37.119171, -6.496007, 50]
-            - [37.134092, -6.472401, 50]
+          mission_id: "uav_1"
+          route:
+            - name: "doñana linea1"
+              uav: "uav_2"
+              wp:
+                - {
+                    pos: [37.41031527664839, -6.002355556298255, 5],
+                    yaw: 0,
+                    gimbal: -40,
+                    action: { photo: true },
+                  }
+                - {
+                    pos: [37.41035892250692, -6.002406773965073, 5],
+                    yaw: 55,
+                    gimbal: 0,
+                    action: { video_start: 0, gimbal: -40, yaw: -20 },
+                  }
+                - {
+                    pos: [37.41041474947755, -6.002324068339875, 5],
+                    yaw: 30,
+                    gimbal: -80,
+                    action: { gimbal: -40, yaw: -20 },
+                  }
+                - {
+                    pos: [37.41037167365715, -6.002275066705595, 5],
+                    yaw: -90,
+                    gimbal: -30,
+                    action: { video_stop: 0 },
+                  }
+              attributes:
+                mode_landing: 2
+                mode_yaw: 3
+                mode_gimbal: 0
+                mode_trace: 0
+                idle_vel: 1.0
         status: "OK"
