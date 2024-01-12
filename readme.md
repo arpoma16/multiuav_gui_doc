@@ -8,4 +8,4 @@ creacion de archivo async api
 npm install -g @asyncapi/generator
 ag websocket.yaml @asyncapi/html-template -o websocket
 
-likec4 build -o ./build ./src --base "https://arpoma16.github.io/multiuav_gui_doc/architecture/dist/"
+likec4 build -o ./build ./src --base "multiuav_gui_doc/architecture/build/"
