@@ -1,18 +1,29 @@
 model {
     extend GCS.backend {
-        missionManager = component 'Mission manager' {
+        missionManager = component 'Mission Manager' {
             #api
-            description 'Mision Inspection logic'
+            description 'Mission inspection logic'
         }
-        express = component 'RestAPI & websocket ' {
+        express = component 'REST API & Socket ' {
             #api
-            description 'Rest api for the backend uses  Express'
+            description 'REST API for the backend 
+            uses Express and send Telemetry'
         }
         //socket = component 'Websocket'
-        events = component 'Events Manager'
-        deviceManager = component 'Device Manager'
-        roslib = component 'RosLibjs'
-        ftp = component 'FileTransferManager'
+        events = component 'Events Manager' {
+
+        }
+        deviceManager = component 'Device Manager' {
+            description 'Process all devices msg & command '
+        }
+        roslib = component 'ROSLibjs'{
+            description 'Convert msg and command 
+            to ROS & the other way '
+        }
+        ftp = component 'File Manager' {
+            description 'Download mission files 
+            from Devices'
+        }
 
         GCS.ui -> express
         //socket -> GCS.ui 
@@ -21,18 +32,22 @@ model {
         express -> missionManager
         missionManager -> elevationApi.ElevAPI 'HTTP'
         missionManager -> deviceManager
-        deviceManager -> roslib
         missionManager -> ftp
-        roslib -> deviceManager
         ftp -> device 'FTP'
-        roslib -> events
+
+        deviceManager -> roslib 'Msg & Srv ROS'
+        roslib -> deviceManager
+
+        deviceManager -> events 'Create events'
         deviceManager -> GCS.mediamtx 'API REST'
+
         //events -> socket
         //deviceManager -> socket
         events -> express
         //express -> GCS.ui
         //deviceManager -> express
-        roslib -> GCS.Rosbridge 'Send/recv UDP msg'
+        roslib -> GCS.Rosbridge 'Send/Recv msg'
+
         //GCS.Rosbridge -> roslib 'UDP'
 
     }
@@ -44,6 +59,26 @@ views {
         include GCS.ui,
         *,
         GCS,
+        -> device
+
+        style GCS {
+            color muted
+        }
+
+        style GCS.backend {
+            color muted
+        }
+        style GCS.ui {
+            color green
+            
+        }
+
+    }
+
+    view backend_complete of GCS.backend {
+        include GCS.ui,
+        *,
+        GCS,GCS.RosMultimaster,
         -> device
 
         style GCS {

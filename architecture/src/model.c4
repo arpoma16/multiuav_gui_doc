@@ -27,22 +27,24 @@ model {
     description 'Monitor of UAV'
     -> ui 'open in browser'
   }
-  device = UAV 'device' {
-    description 'ROS enviroment & RSTP server of UAV'
+  device = UAV 'Device' {
+    description 'ROS enviroment & 
+    RSTP server of UAV'
   }
  
   GCS = system 'GCS' {
-    description  ''
+    description  'Ground control Station'
 
     ui = container 'Frontend' {
       description 'Single web aplication'
-      technology: 'Reactjs node 18'
+      technology: 'Reactjs node V18'
       style {
         shape browser
       }
       -> backend 'request via HTTPS'
     }
-    backend = container 'Backend Services' {
+    backend = container 'GCS Backend' {
+      technology: 'Javascript Nodejs V18'
       description '
         Implements business logic,
         comunication with UAVs using ROS
@@ -57,7 +59,7 @@ model {
       -> device 'RTSP H264'
     }
 
-    Rosbridge = container 'RosBridge' {
+    Rosbridge = container 'ROSBridge' {
        -> RosMultimaster 'ROS'
     } 
     RosMultimaster = container 'Multimaster FLK' {
