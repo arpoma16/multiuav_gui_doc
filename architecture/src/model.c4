@@ -54,7 +54,7 @@ model {
       -> Rosbridge 'UDP socket'
       -> device 'FTP'
     }
-    mediamtx = container 'Multimedia server' {
+    mediamtx = container 'Multimedia Server' {
       description ' RealTime video Transmission'
       -> device 'RTSP H264'
     }

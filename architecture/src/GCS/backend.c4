@@ -1,14 +1,16 @@
 model {
     extend GCS.backend {
-        missionManager = component 'Mission Manager' {
-            #api
-            description 'Mission inspection logic'
-        }
         express = component 'REST API & Socket ' {
             #api
             description 'REST API for the backend 
             uses Express and send Telemetry'
         }
+        
+        missionManager = component 'Mission Manager' {
+            #api
+            description 'Mission inspection logic'
+        }
+
         //socket = component 'Websocket'
         events = component 'Events Manager' {
 
@@ -31,6 +33,7 @@ model {
         express -> deviceManager
         express -> missionManager
         missionManager -> elevationApi.ElevAPI 'HTTP'
+        missionManager -> Planning.PlanningAPi 'Mission Request'
         missionManager -> deviceManager
         missionManager -> ftp
         ftp -> device 'FTP'
@@ -97,6 +100,23 @@ views {
     view my_backend of GCS.backend {
          include *,
         -> GCS.ui,
+
+        style GCS {
+            color muted
+        }
+
+        style GCS.backend {
+            color muted
+        }
+        style GCS.ui {
+            color green
+            
+        }
+    }
+        view my_backend3 of GCS.backend {
+         include *,
+        -> GCS.ui
+        exclude device,
 
         style GCS {
             color muted
