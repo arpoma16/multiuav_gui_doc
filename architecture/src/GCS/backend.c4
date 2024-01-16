@@ -1,9 +1,8 @@
 model {
     extend GCS.backend {
-        express = component 'REST API & Socket ' {
+        express = component 'Comunication Layer ' {
             #api
-            description 'REST API for the backend 
-            uses Express and send Telemetry'
+            description 'REST API & Socket'
         }
         
         missionManager = component 'Mission Manager' {
@@ -18,9 +17,13 @@ model {
         deviceManager = component 'Device Manager' {
             description 'Process all devices msg & command '
         }
-        roslib = component 'ROSLibjs'{
+        rosManager = component 'Ros Manager'{
             description 'Convert msg and command 
-            to ROS & the other way '
+            to ROS & Manage conexion '
+        }
+        comands = component 'Command Controller' {
+            description 'Download mission files 
+            from Devices'
         }
         ftp = component 'File Manager' {
             description 'Download mission files 
@@ -36,10 +39,12 @@ model {
         missionManager -> Planning.PlanningAPi 'Mission Request'
         missionManager -> deviceManager
         missionManager -> ftp
+        missionManager -> comands
         ftp -> device 'FTP'
 
-        deviceManager -> roslib 'Msg & Srv ROS'
-        roslib -> deviceManager
+        deviceManager -> rosManager 'Msg & Srv ROS'
+        //rosManager -> deviceManager
+        comands -> rosManager
 
         deviceManager -> events 'Create events'
         deviceManager -> GCS.mediamtx 'API REST'
@@ -49,7 +54,7 @@ model {
         events -> express
         //express -> GCS.ui
         //deviceManager -> express
-        roslib -> GCS.Rosbridge 'Send/Recv msg'
+        rosManager -> GCS.Rosbridge 'Send/Recv msg'
 
         //GCS.Rosbridge -> roslib 'UDP'
 
