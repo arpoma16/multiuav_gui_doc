@@ -4,21 +4,24 @@
     <h1>Mission Inspection State Machine in GCS</h1>
     <pre class="mermaid">
       stateDiagram-v2
-          [*] --> Planing: Envio de mission a GCS
-          Planing  -->  LoadMission 
-          LoadMission --> CommandMission : mission loaded
-          returntohome --> donwloadFiles : landing
+          state "Donwload files  from  UAV" as donwloadFiles
+          state "Command mission" as CommandMission
+          state "Load mission" as LoadMission
+          state "Doing mission" as Doing     
+          state "Return to home" as returntohome
+          [*] --> Planning: Send mission to GCS
+          Planning  -->  LoadMission 
+          LoadMission --> CommandMission : Mission loaded
+          returntohome --> donwloadFiles : Landing
           state Error <<join>>
-          CommandMission --> Error : failt
-          LoadMission --> Error : failt
-          CommandMission --> Doing : mission commanded
-          Error --> resetuav
-          resetuav --> LoadMission
-          Doing --> donwloadFiles : recive finish mission
-           Doing --> returntohome : recive cancel mission
-          donwloadFiles  --> donwloadFilesgcs : recive finish donwload
-          donwloadFilesgcs  --> [*] 
-          resetuav --> [*] : into resertuav 2 times
+          CommandMission --> Error : Error
+          LoadMission --> Error : Error
+          CommandMission --> Doing : Mission commanded
+          Error --> Notification
+          Doing --> donwloadFiles : Finish mission
+          Doing --> returntohome : Cancel mission
+          donwloadFiles --> [*] : Files Downloaded
+          Notification --> [*] 
     </pre>
     <script type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
