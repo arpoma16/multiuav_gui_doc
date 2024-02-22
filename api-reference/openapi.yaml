@@ -53,6 +53,11 @@ paths:
       description: Return the list of devices
       parameters:
         - $ref: "#/components/parameters/token"
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: To fetch one or more devices. Multiple params can be passed like `id=31&id=42`
       responses:
         200:
           description: (ok) list of devices
@@ -109,6 +114,12 @@ paths:
         and _to_ fields are not required with _id_.
       tags:
         - Positions
+      parameters:
+        - in: query
+          name: deviceId
+          schema:
+            type: integer
+          description: _deviceId_ is optional,but it return the las position of this device.Multiple params can be passed like `DeviceId=31&DeviceId=42`
       responses:
         "200":
           description: OK
