@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <pre class="mermaid">
+      sequenceDiagram
+      Single_Web_Aplication->>+Backend: user action's
+      Backend->>+ROSBridge: ROS action's
+      ROSBridge->>+UAV: ROS Topic / Service
+      UAV ->>+ ROSBridge: msg / srv
+      ROSBridge ->>+ Backend: read & process
+      Backend ->>+ Single_Web_Aplication: Api Response & socket  
+    </pre>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    </script>
+  </body>
+</html>

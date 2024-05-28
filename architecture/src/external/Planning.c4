@@ -1,6 +1,0 @@
-model {
-  Planning = system 'Planning' {
-    description 'Api of Planning'
-    PlanningAPi = service 'PlanningAPi'
-  }
-}

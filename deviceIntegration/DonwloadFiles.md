@@ -1,0 +1,1 @@
+the devices are diferents

@@ -1,0 +1,970 @@
+openapi: "3.0.3"
+#this is based of https://www.traccar.org/api-reference/#tag/Commands/paths/~1commands~1%7Bid%7D/put
+# you can view in  https://redocly.github.io/redoc/ #se modifico el HTML imprimir la documentacion
+info:
+  title: GCS (Ground  control Station MultiUAV)
+  description: |-
+    Descripcion de API de Alto nivel para comunicacion de Ros  con UAV.
+    some usefull link:
+    - [Repositorio](https://github.com/alvcaballero/multiuav_gui/tree/react)
+  version: "2.3.5"
+  contact:
+    email: arpoma167@gmail.com
+externalDocs:
+  description: Find more about the project
+  url: https://grvc.us.es/
+servers:
+  - url: https://localhost:4000/api/
+tags:
+  - name: Devices
+    description: Management of UAV-devices
+  - name: Positions
+    description: Obtains raw data from the UAV
+  - name: Commands
+    description: Send command the UAV
+  - name: Commands_type_explain
+    description: how send command the UAV using command/send post API
+  - name: Missions
+    description: all about the mission of UAV
+  - name: Files
+    description: Files of result mission
+  - name: ROS
+    description: tool for  get information of topics and services of ROS
+  - name: Utils
+    description: configuration form onboard computer of UAV
+
+#  - name: Events
+#    description: Obtiene informacion de eventos
+#  - name: Notifications
+#    description: Gestion de notificaciones de usuario
+#  - name: session
+#    description: for future
+#  - name: Reports
+#    description: for future
+#  - name: Camera
+#    description: for future
+
+paths:
+  /devices:
+    get:
+      tags:
+        - Devices
+      summary: Fetch a list of Devices
+      description: Return the list of devices
+      parameters:
+        - $ref: "#/components/parameters/token"
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: To fetch one or more devices. Multiple params can be passed like `id=31&id=42`
+      responses:
+        200:
+          description: (ok) list of devices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListDevice"
+        400:
+          description: No permission
+          content: {}
+    post:
+      summary: Create a Device
+      tags:
+        - Devices
+      parameters:
+        - $ref: "#/components/parameters/token"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyAddUAV"
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BodyAddUAV"
+      x-codegen-request-body-name: body
+
+  /devices/{id}:
+    delete:
+      summary: Delete a Device
+      tags:
+        - Devices
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: No Content
+          content: {}
+
+  /positions:
+    get:
+      summary: Fetches a list of Positions
+      description: We strongly recommend using Websocket
+        instead of periodically polling positions endpoint. Without any params, it
+        returns a list of last known positions for all the user's Devices. _from_
+        and _to_ fields are not required with _id_.
+      tags:
+        - Positions
+      parameters:
+        - in: query
+          name: deviceId
+          schema:
+            type: integer
+          description: _deviceId_ is optional,but it return the las position of this device.Multiple params can be passed like `DeviceId=31&DeviceId=42`
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPosition"
+
+  /comands/send:
+    get:
+      summary: Fetches a list of avaliable commands
+      description: list of avaliable command
+      tags:
+        - Commands
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listcommands"
+    post:
+      summary: Send command to devices
+      description: Send command to  devices
+      tags:
+        - Commands
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Command"
+        required: true
+      responses:
+        "200":
+          description: Command sent
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Command"
+        "400":
+          description: Command no match
+          content: {}
+      x-codegen-request-body-name: body
+
+  /missions/:
+    get:
+      summary: Get Current mission
+      description: Return the currente mission
+      tags:
+        - Missions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getmission"
+
+  /missions/sendTask:
+    post:
+      summary: Send a task to GCS for UAVs inspection
+      description: without any parameter,load the mission all UAV's
+      tags:
+        - Missions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task_msg"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/resulMissionTask"
+  /files/routes/:
+    get:
+      summary: list of files
+      description: Return an array with the files of result of mission
+      tags:
+        - Files
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listFiles"
+
+  /files/download/{filename*}:
+    get:
+      summary: Donwload file
+      description: Donwload files
+      tags:
+        - Files
+      parameters:
+        - in: path
+          name: filename
+          schema:
+            type: string
+            example: "mission_1241/uav_15/DJI_20231124132054_0002_WIDE.jpg"
+          required: true
+          description: direction of file
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+
+  /ros/topics:
+    get:
+      summary: Topics
+      description: list of topics
+      tags:
+        - ROS
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listTopics"
+  /ros/services:
+    get:
+      summary: services
+      description: list of services in ROS
+      tags:
+        - ROS
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listServices"
+  /utils/datetime:
+    get:
+      summary: Get date time of GCS
+      description: return date time for update datetime of UAVs.
+      tags:
+        - Utils
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  datetime:
+                    type: string
+                    description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+                    format: date-time
+  /loadmission:
+    post:
+      summary: Load Mission
+      description: explaint type command load mission
+      tags:
+        - Commands_type_explain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoadMission"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+
+  /commandmission:
+    post:
+      summary: Command Mission
+      description: explaint type command command mission
+      tags:
+        - Commands_type_explain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/commandmission"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+
+  /gimbal:
+    post:
+      summary: Command Gimbal
+      description: explaint type command Gimbal
+      tags:
+        - Commands_type_explain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Gimbal"
+        required: true
+
+      responses:
+        "200":
+          description: planned route
+
+components:
+  #responses:
+
+  parameters:
+    token:
+      name: token
+      in: header
+      description: Token de autenticacion
+      required: false
+      schema:
+        type: string
+
+  schemas:
+    BodyAddUAV:
+      type: object
+      properties:
+        uav_id:
+          type: string
+        uav_type:
+          type: string
+
+    ListDevice:
+      type: array
+      items:
+        $ref: "#/components/schemas/Device"
+      example:
+        - id: "0"
+          name: "uav_2"
+          category: "dji"
+          ip: "10.42.0.43"
+          camera:
+            - type: "WebRTC"
+              source: "main"
+          status: "offline"
+          lastUpdate: null
+        - id: "1"
+          name: "uav_4"
+          category: "dji_M300"
+          ip: "10.42.0.44"
+          camera:
+            - type: "WebRTC"
+              source: "main"
+          status: "offline"
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+        lastUpdate:
+          type: string
+          description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+          format: date-time
+        ip:
+          type: string
+        category:
+          type: string
+        camera:
+          type: array
+          items:
+            type: object
+            properties:
+              types:
+                type: string
+              source:
+                type: string
+            example:
+              - { type: "WebRTC", source: "main" }
+              - { type: "WebRTC", source: "fpv" }
+    ListPosition:
+      type: array
+      items:
+        $ref: "#/components/schemas/Position"
+    Position:
+      type: object
+      properties:
+        #id:
+        #  type: integer
+        deviceId:
+          type: integer
+        #protocol:
+        #  type: string
+        deviceTime:
+          type: string
+          description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+          format: date-time
+        #fixTime:
+        #  type: string
+        #  description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+        #  format: date-time
+        #serverTime:
+        #  type: string
+        #  description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+        #  format: date-time
+        #outdated:
+        #  type: boolean
+        #valid:
+        #  type: boolean
+        latitude:
+          type: number
+        longitude:
+          type: number
+        altitude:
+          type: number
+          description: in meters
+        speed:
+          type: number
+          description: in metres/s
+        course:
+          type: number
+          description: value of -180 to 180 degrees
+        #address:
+        #  type: string
+        accuracy:
+          type: number
+        #network:
+        #  type: object
+        #  properties: {}
+        attributes:
+          type: object
+          properties:
+            batery:
+              type: number
+            gimbal:
+              type: array
+              description: array with 3 element  yaw pich roll
+              example: [0, -90, 40]
+            obstacle_info:
+              type: array
+              description: List of values of distance sensor in device [down,front,rigth,back,left, up ]
+              example: [10, 30, 100, 100, 100, 20]
+            takeoff_height:
+              type: number
+              example: 480
+            #protocol:
+            #  type: string
+            mission_state:
+              type: string
+              description: can take values like ready, missionload, in_mission, finish_mission
+              example: missionload
+            wp_reached:
+              type: integer
+              description: number of waypoint of device arrived
+              example: 0
+            uav_state:
+              type: string
+              description: take values like multirotor, plane, transition
+              example: multirotor
+            landed_state:
+              type: string
+              description: take values like stop, ON_GROUND , IN_AIR
+              example: IN_AIR
+            alarm:
+              type: string
+              description: take values like UNDEFINED, threat
+              example: threat
+    LoadMission:
+      type: object
+      properties:
+        deviceId:
+          type: number
+          description: "Id of UAV or value of -1 for send all "
+          example: 1
+        type:
+          type: string
+          description: "loadMission"
+          example: "loadMission"
+        attributes:
+          type: array
+          description: "list of routes"
+          items:
+            $ref: "#/components/schemas/Route"
+    commandmission:
+      type: object
+      properties:
+        deviceId:
+          type: number
+          description: "Id of UAV or value of -1 for send all "
+          example: 1
+        type:
+          type: string
+          description: "commandMission"
+          example: "commandMission"
+    Gimbal:
+      type: object
+      properties:
+        deviceId:
+          type: number
+          description: "Id of UAV or value of -1 for send all "
+          example: 1
+        type:
+          type: string
+          description: "loadMission"
+          example: "loadMission"
+        attributes:
+          type: object
+          properties:
+            pitch:
+              type: number
+              description: "number of -180 to 180 degree"
+              example: -90
+            yaw:
+              type: number
+              description: "number of -180 to 180 degree"
+              example: 0
+            roll:
+              type: number
+              description: "number of -180 to 180 degree"
+              example: 0
+
+    Route:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "linea mata las cañas"
+        uav:
+          type: string
+          example: "uav_1"
+        wp:
+          type: array
+          items:
+            $ref: "#/components/schemas/mission_waypoint"
+        attributes:
+          type: object
+          properties:
+            mode_landing:
+              type: integer
+              description: 2 gps autolanding
+              example: 2
+            mode_yaw:
+              type: integer
+              example: 3
+            mode_gimbal:
+              type: integer
+              description: 0 free and 1 mission ( using 0 for move with actions)
+              example: 0
+            mode_trace:
+              type: integer
+              example: 0
+            idle_vel:
+              type: number
+              description: speed of vehicle
+              example: 7
+
+    mission_waypoint:
+      type: object
+      properties:
+        pos:
+          type: array
+          items:
+            type: number
+          example: [37.53395183, -6.30202933, 10]
+          description: "latitude, longitude, relative altitude at takeoff"
+          enum:
+            - latitude
+            - longitude
+            - altitud
+          minItems: 3
+          maxItems: 3
+        yaw:
+          type: number
+          example: 20
+        gimbal:
+          type: number
+          example: 45
+        action:
+          type: object
+          description: if don't put any  get de default value
+          properties:
+            video_start:
+              type: number
+              example: 0
+            gimbal:
+              type: number
+              example: value of 0 to -90
+            yaw:
+              type: number
+              example: value of 0 to -90
+            video_stop:
+              type: number
+              example: value of 0
+            photo:
+              type: number
+              example: value of 0
+
+    getmission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1234
+        uav:
+          type: array
+          items:
+            type: object
+            properties:
+              uav:
+                type: string
+                example: "uav_2"
+              status:
+                type: string
+                example: "init"
+        route:
+          type: array
+          items:
+            $ref: "#/components/schemas/Route"
+        initTime:
+          type: string
+          description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+          format: date-time
+
+    task_msg:
+      type: object
+      properties:
+        mission_id:
+          type: integer
+          example: 1234
+          description: "identificador por GridWacth"
+        objetivo:
+          type: integer
+          example: 0
+          description: "0: Localizacion de incidencia 1: Inpecion de zona de aves, 2: Levantamiento Lidar"
+        loc:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              geo_points:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    lat:
+                      type: number
+                      example: 37.0199008980604
+                    lon:
+                      type: number
+                      example: -6.559872232408047
+          example:
+            - name: tramo0
+              geo_points:
+                - { lat: 37.121203, lon: -6.492668 }
+                - { lat: 37.116616, lon: -6.484771 }
+                - { lat: 37.107177, lon: -6.479203 }
+            - name: tramo1
+              geo_points:
+                - { lat: 37.121203, lon: -6.492668 }
+                - { lat: 37.116616, lon: -6.484771 }
+                - { lat: 37.107177, lon: -6.479203 }
+        meteo:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                example: 37.01455061559604
+              lon:
+                type: number
+                example: -6.5625427378086489
+              wind_vel:
+                type: number
+                example: 12
+                description: "velocidad en metros/s"
+              temp:
+                type: number
+                example: 38
+                description: "temperatura en grados celcius"
+              humidity:
+                type: number
+                example: 90
+                description: "porcentaje "
+              pressure:
+                type: number
+                example: 1201
+                description: "presion atmosferica  en hPa"
+          example:
+            - lat: 37.01455061559604
+              lon: -6.5625427378086489
+              wind_vel: 12
+              wind_dir: 360
+              temp: 38
+              humidity: 90
+              pres_atm: 5
+            - lat: 37.01455061559604
+              lon: -6.5625427378086489
+              wind_vel: 12
+              wind_dir: 360
+              temp: 38
+              humidity: 90
+              pres_atm: 5
+    listFiles:
+      type: array
+      items: string
+      example:
+        - "mission_1241/uav_15/DJI_20231124132052_0002_THRM_process.jpg"
+        - "mission_1241/uav_15/DJI_20231124132054_0002_WIDE.jpg"
+        - "mission_1241/uav_15/DJI_20231124132054_0002_ZOOM.jpg"
+        - "mission_1242/uav_15/DJI_20231124131954_0001_THRM.jpg"
+        - "mission_1242/uav_15/DJI_20231124131954_0001_THRM_process.jpg"
+
+    listTopics:
+      type: array
+      items: string
+      example:
+        - /rosout
+        - /rosout_agg
+        - /uav_2/dji_control/velocity
+        - /uav_2/dji_osdk_ros/acceleration_ground_fused
+        - /uav_2/dji_osdk_ros/angular_velocity_fused
+        - /uav_2/dji_osdk_ros/attitude
+        - /uav_2/dji_osdk_ros/battery_state
+        - /uav_2/dji_osdk_ros/camera_h264_stream
+        - /uav_2/dji_osdk_ros/display_mode
+        - /uav_2/dji_osdk_ros/flight_anomaly
+        - /uav_2/dji_osdk_ros/flight_status
+
+    listServices:
+      type: array
+      items: string
+      example:
+        - /rosout/get_loggers
+        - /rosout/set_logger_level
+        - /uav_2/camera_record_video_action
+        - /uav_2/camera_start_shoot_aeb_photo
+        - /uav_2/camera_start_shoot_burst_photo
+
+    listcommands:
+      type: array
+      items:
+        type: string
+      example:
+        - threat
+        - loadMission
+        - commandMission
+        - threat
+        - SincroniseFiles
+        - ResumeMission
+        - Gimbal
+
+    Command:
+      type: object
+      properties:
+        deviceId:
+          type: integer
+        type:
+          type: string
+        attributes:
+          type: object
+          properties: {}
+      example:
+        deviceId: -1
+        type: "loadMission"
+        attributes:
+          - uav: uav_2
+            wp:
+              - pos:
+                  - 38.13898041
+                  - -3.17466429
+                  - 9
+                action:
+                  video_start: 0
+                  gimbal: -90
+                  yaw: 153.6
+              - pos:
+                  - 38.13898041
+                  - -3.17466429
+                  - 30
+                action:
+                  gimbal: -90
+                  yaw: 153.6
+              - pos:
+                  - 38.13816516
+                  - -3.17414854
+                  - 29.188751
+                action:
+                  gimbal: -90
+                  yaw: -110.8
+              - pos:
+                  - 38.13785254
+                  - -3.17518588
+                  - 26.939178
+                action:
+                  gimbal: -90
+                  yaw: -110.8
+            attributes:
+              mode_landing: 2
+              mode_yaw: 2
+              mode_gimbal: 0
+              idle_vel: 7
+          - uav: uav_1
+            wp:
+              - pos:
+                  - 38.13921488
+                  - -3.17343119
+                  - 9
+                action:
+                  video_start: 0
+                  gimbal: -45
+                  yaw: 83.4
+              - pos:
+                  - 38.13921488
+                  - -3.17343119
+                  - 30
+                action:
+                  gimbal: -45
+                  yaw: 83.4
+              - pos:
+                  - 38.13954244
+                  - -3.16989962
+                  - 32.601624
+                action:
+                  gimbal: -45
+                  yaw: 160.7
+              - pos:
+                  - 38.13984488
+                  - -3.1688074
+                  - 35.070221
+                action:
+                  gimbal: -45
+                  yaw: 160.9
+              - pos:
+                  - 38.13921488
+                  - -3.17343119
+                  - 15
+                action:
+                  video_stop: 0
+            attributes:
+              mode_landing: 0
+              mode_yaw: 2
+              mode_gimbal: 0
+              idle_vel: 7
+          - uav: uav_33
+            wp:
+              - pos:
+                  - 38.13889480850935
+                  - -3.1750557387829303
+                  - 9
+                action:
+                  video_start: 0
+                  gimbal: -90
+                  yaw: -112.3
+              - pos:
+                  - 38.14194543
+                  - -3.16625177
+                  - 111.046204
+                action:
+                  gimbal: -90
+                  yaw: -126.5
+              - pos:
+                  - 38.14030573
+                  - -3.16905065
+                  - 105.457245
+                action:
+                  gimbal: -90
+                  yaw: -105.9
+              - pos:
+                  - 38.13968243253984
+                  - -3.171996373829245
+                  - 100
+                action:
+                  video_stop: 0
+            attributes:
+              mode_landing: 2
+              mode_yaw: 2
+              mode_gimbal: 0
+              idle_vel: 5
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        attributes:
+          type: object
+          properties: {}
+
+    resulMissionTask:
+      type: object
+      properties:
+        mission_id:
+          type: integer
+          example: 1234
+        route:
+          type: array
+          items:
+            $ref: "#/components/schemas/Route"
+
+        status:
+          type: string
+          description: status of planing, fail  don't cant calculate
+      example:
+        response:
+          mission_id: "uav_1"
+          route:
+            - name: "doñana linea1"
+              uav: "uav_2"
+              wp:
+                - {
+                    pos: [37.41031527664839, -6.002355556298255, 5],
+                    yaw: 0,
+                    gimbal: -40,
+                    action: { photo: true },
+                  }
+                - {
+                    pos: [37.41035892250692, -6.002406773965073, 5],
+                    yaw: 55,
+                    gimbal: 0,
+                    action: { video_start: 0, gimbal: -40, yaw: -20 },
+                  }
+                - {
+                    pos: [37.41041474947755, -6.002324068339875, 5],
+                    yaw: 30,
+                    gimbal: -80,
+                    action: { gimbal: -40, yaw: -20 },
+                  }
+                - {
+                    pos: [37.41037167365715, -6.002275066705595, 5],
+                    yaw: -90,
+                    gimbal: -30,
+                    action: { video_stop: 0 },
+                  }
+              attributes:
+                mode_landing: 2
+                mode_yaw: 3
+                mode_gimbal: 0
+                mode_trace: 0
+                idle_vel: 1.0
+        status: "OK"
