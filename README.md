@@ -6,7 +6,7 @@ This project is part of [Multi UAV System Project](https://github.com/alvcaballe
 
 ## What it is
 
-<img src="images/Rosbag.gif" alt="Example of the GCS interface">
+<img src="images/Screenshots.gif" alt="Example of the GCS interface">
 
 ## 📋 Features
 
