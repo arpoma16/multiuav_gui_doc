@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <pre class="mermaid">
+      sequenceDiagram
+      GCS->>+UAV: Download files from Autopilot
+      UAV->>-GCS: Download downloaded
+      UAV-->UAV: download files of mision
+      UAV->>GCS: FinishGetFiles
+      GCS-->GCS: SFTP download files from UAV
+      GCS-->GCS: Process thermal images
+    </pre>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    </script>
+  </body>
+</html>
