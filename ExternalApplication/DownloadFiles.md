@@ -23,6 +23,15 @@ http://127.0.0.1:4000/files/download/mission_1241/uav_15/DJI_20231124132054_0002
 
 The server ftp is mounted on port 22 and only allow the access to file where save the mission result and can access using the USER and PASSWORD given for the administrator. and you can download files using the routed give for the api.
 
+The GCS use vsftpd with virtual users
+https://github.com/dagwieers/vsftpd/tree/3.0.2/EXAMPLE/VIRTUAL_USERS
+https://github.com/dagwieers/vsftpd/tree/3.0.2/EXAMPLE/VIRTUAL_USERS_2
+
+For access to the server run
+
 ```
-ftp localhost 22
+// ftp localhost 22
+
+ftp ip 22
+
 ```
