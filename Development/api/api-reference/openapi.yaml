@@ -6,7 +6,7 @@ info:
   description: |-
     Descripcion de API de Alto nivel para comunicacion de Ros  con UAV.
     some usefull link:
-    - [Repositorio](https://github.com/alvcaballero/multiuav_gui/tree/react)
+    - [Repositorio](https://github.com/alvcaballero/multiuav_gui/)
   version: "2.3.5"
   contact:
     email: arpoma167@gmail.com
@@ -22,15 +22,13 @@ tags:
     description: Obtains raw data from the UAV
   - name: Commands
     description: Send command the UAV
-  - name: Commands_type_explain
-    description: how send command the UAV using command/send post API
   - name: Missions
     description: all about the mission of UAV
   - name: Files
     description: Files of result mission
   - name: ROS
     description: tool for  get information of topics and services of ROS
-  - name: Utils
+  - name: SERVER
     description: configuration form onboard computer of UAV
 
 #  - name: Events
@@ -119,7 +117,7 @@ paths:
           name: deviceId
           schema:
             type: integer
-          description: _deviceId_ is optional,but it return the las position of this device.Multiple params can be passed like `DeviceId=31&DeviceId=42`
+          description: _deviceId_ is optional,but it return the last position of this device.Multiple params can be passed like `DeviceId=31&DeviceId=42`
       responses:
         "200":
           description: OK
@@ -170,6 +168,12 @@ paths:
       description: Return the currente mission
       tags:
         - Missions
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: _id_ is optional,but it return the mission with this id
       responses:
         "200":
           description: OK
@@ -177,6 +181,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/getmission"
+
+  /missions/routes:
+    get:
+      summary: Get list of routes
+      description: Return the list of routes
+      tags:
+        - Missions
+      parameters:
+        - in: query
+          name: missionId
+          schema:
+            type: integer
+          description: _missionId_ is optional,but it return the routes  with this missionId
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getroute"
 
   /missions/sendTask:
     post:
@@ -193,24 +217,45 @@ paths:
 
       responses:
         "200":
-          description: planned route
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/resulMissionTask"
-  /files/routes/:
+          description: ok
+          #  content:
+          #    application/json:
+          #      schema:
+          #        $ref: "#/components/schemas/resulMissionTask"
+
+  #/files/routes/:
+  #  get:
+  #    summary: list of files
+  #    description: Return an array with the files of result of mission
+  #    tags:
+  #      - Files
+  #    responses:
+  #      "200":
+  #        description: OK
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/listFiles"
+
+  /files/get:
     get:
       summary: list of files
       description: Return an array with the files of result of mission
       tags:
         - Files
+      parameters:
+        - in: query
+          name: missionId
+          schema:
+            type: integer
+          description: _missionId_ is optional,but it return the list of files  with this missionId
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/listFiles"
+                $ref: "#/components/schemas/dbfiles"
 
   /files/download/{filename*}:
     get:
@@ -261,12 +306,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/listServices"
-  /utils/datetime:
+
+  /server:
+    get:
+      summary: Get server configuration
+      description: return configuration of server
+      tags:
+        - SERVER
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/server"
+  /server/datetime:
     get:
       summary: Get date time of GCS
       description: return date time for update datetime of UAVs.
       tags:
-        - Utils
+        - SERVER
       responses:
         "200":
           description: OK
@@ -279,56 +338,6 @@ paths:
                     type: string
                     description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
                     format: date-time
-  /loadmission:
-    post:
-      summary: Load Mission
-      description: explaint type command load mission
-      tags:
-        - Commands_type_explain
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoadMission"
-        required: true
-
-      responses:
-        "200":
-          description: planned route
-
-  /commandmission:
-    post:
-      summary: Command Mission
-      description: explaint type command command mission
-      tags:
-        - Commands_type_explain
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/commandmission"
-        required: true
-
-      responses:
-        "200":
-          description: planned route
-
-  /gimbal:
-    post:
-      summary: Command Gimbal
-      description: explaint type command Gimbal
-      tags:
-        - Commands_type_explain
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Gimbal"
-        required: true
-
-      responses:
-        "200":
-          description: planned route
 
 components:
   #responses:
@@ -621,30 +630,92 @@ components:
               example: value of 0
 
     getmission:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1234
-        uav:
-          type: array
-          items:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1234
+          initTime:
+            type: string
+            description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+            format: date-time
+          endTime:
+            type: string
+            description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
+            format: date-time
+          status:
+            type: string
+          mission:
+            type: array
+            items:
+              $ref: "#/components/schemas/Route"
+          result:
             type: object
             properties:
-              uav:
-                type: string
-                example: "uav_2"
-              status:
-                type: string
-                example: "init"
-        route:
-          type: array
-          items:
-            $ref: "#/components/schemas/Route"
-        initTime:
-          type: string
-          description: in IS0 8601 format. eg. `1963-11-22T18:30:00Z`
-          format: date-time
+              latitude:
+                type: number
+              longitude:
+                type: number
+              measures:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: number
+
+    getroute:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+          status:
+            type: string
+          missionId:
+            type: integer
+            format: int32
+          deviceId:
+            type: string
+          initTime:
+            type: string
+          endTime:
+            type: string
+          result:
+            type: object
+            properties:
+              latitude:
+                type: number
+              longitude:
+                type: number
+              measures:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: number
+      example:
+        - id: 1
+          status: finish
+          missionId: 72510181
+          deviceId: "14"
+          initTime: "2024-03-05T12:20:46"
+          endTime: "2024-03-05T12:45:46"
+          result:
+            latitude: 37.09241
+            longitude: -5.232
+            measures:
+              - name: minDistance
+                value: 25.34
 
     task_msg:
       type: object
@@ -728,6 +799,60 @@ components:
               temp: 38
               humidity: 90
               pres_atm: 5
+
+    dbfiles:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+          routeId:
+            type: integer
+            format: int32
+          missionId:
+            type: integer
+            format: int32
+          deviceId:
+            type: string
+          name:
+            type: string
+          route:
+            type: string
+          date:
+            type: string
+          attributes:
+            type: object
+            properties:
+              latitude:
+                type: number
+              longitude:
+                type: number
+              measures:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: number
+      example:
+        - id: 1
+          routeId: 1
+          missionId: 72510181
+          deviceId: "14"
+          name: DJI_20240305122904_0010_WIDE.jpg
+          route: "/mission_72510181/uav_14/"
+          date: "2024-03-05T12:29:04"
+          attributes:
+            latitude: 37.09241
+            longitude: -5.232
+            measures:
+              - name: MaxTemp
+                value: 83.7
+
     listFiles:
       type: array
       items: string
@@ -968,3 +1093,117 @@ components:
                 mode_trace: 0
                 idle_vel: 1.0
         status: "OK"
+    server:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        attributes:
+          type: object
+          properties:
+            speedUnit:
+              type: string
+            speedLimit:
+              type: number
+            timezone:
+              type: string
+            distanceUnit:
+              type: string
+            glyphs:
+              type: boolean
+        rosState:
+          type: boolean
+        registration:
+          type: boolean
+        readonly:
+          type: boolean
+        deviceReadonly:
+          type: boolean
+        map:
+          type: string
+        bingKey:
+          type: string
+        mapUrl:
+          type: string
+        overlayUrl:
+          type: string
+          format: nullable
+        latitude:
+          type: integer
+          format: int32
+        longitude:
+          type: integer
+          format: int32
+        zoom:
+          type: integer
+          format: int32
+        twelveHourFormat:
+          type: boolean
+        forceSettings:
+          type: boolean
+        coordinateFormat:
+          type: string
+        limitCommands:
+          type: boolean
+        disableReports:
+          type: boolean
+        fixedEmail:
+          type: boolean
+        poiLayer:
+          type: string
+        announcement:
+          type: string
+        emailEnabled:
+          type: boolean
+        geocoderEnabled:
+          type: boolean
+        textEnabled:
+          type: boolean
+        storageSpace:
+          type: array
+          items:
+            type: object
+            properties: {}
+        newServer:
+          type: boolean
+        openIdEnabled:
+          type: boolean
+        openIdForce:
+          type: boolean
+      example:
+        id: 1
+        attributes:
+          speedUnit: kmh
+          speedLimit: 37.796976241900644
+          timezone: Spain/Madrid
+          distanceUnit: km
+          glyphs: true
+        rosState: false
+        registration: true
+        readonly: false
+        deviceReadonly: false
+        map: osm
+        bingKey: ""
+        mapUrl: ""
+        overlayUrl:
+        latitude: 0
+        longitude: 0
+        zoom: 0
+        twelveHourFormat: false
+        forceSettings: false
+        coordinateFormat: ""
+        limitCommands: false
+        disableReports: false
+        fixedEmail: false
+        poiLayer: ""
+        announcement: ""
+        emailEnabled: true
+        geocoderEnabled: true
+        textEnabled: false
+        storageSpace:
+          - 1646120960
+          - 12293705728
+        newServer: false
+        openIdEnabled: false
+        openIdForce: false
