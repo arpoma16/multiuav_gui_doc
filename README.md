@@ -1,6 +1,6 @@
 # MUAV GUI Documentation
 
-> An GCS software that allow command and monitoring multiple UAVs for a heterogeneous fleet of unmannned Aerial Vehicles (UAVs).
+> A GCS software that allow command and monitoring multiple UAVs for a heterogeneous fleet of unmannned Aerial Vehicles (UAVs).
 
 This project is part of [Multi UAV System Project](https://github.com/alvcaballero/multiUAV_system)
 
