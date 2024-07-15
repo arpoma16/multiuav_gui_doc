@@ -22,7 +22,7 @@
   - [Firts step ](ExternalApplication/FirstStep.md)
   - [Video Streaming ](ExternalApplication/videoStreaming.md)
   - [File download ](ExternalApplication/DownloadFiles.md)
-  - [Automatic mission ](ExternalApplication/DownloadFiles.md)
+  - [Automatic mission ](ExternalApplication/AutomaticMission.md)
 
 - Development
   - [Architecture](Development/Architecture.md)
