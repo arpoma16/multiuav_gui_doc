@@ -6,10 +6,10 @@ For send commands to devices the GCS uses ros services.
 
 The follow table have he basic services for management tool can loadmission and run mission to each UAV.
 
-| PATH                     | DATA          | TYPE                            | DESCRIPTION                                       |
-| ------------------------ | ------------- | ------------------------------- | ------------------------------------------------- |
-| uav_id/configure_mission | Load Mission  | aerialcore_common/ConfigMission | Envío de waypoint y atributos de la misión al UAV |
-| uav_id/start_mission     | Start Mission | std_srvs/SetBool                | Señal de despegue de drone                        |
+| PATH                     | DATA          | TYPE                            | DESCRIPTION                    |
+| ------------------------ | ------------- | ------------------------------- | ------------------------------ |
+| uav_id/configure_mission | Load Mission  | aerialcore_common/ConfigMission | Send mission to load in device |
+| uav_id/start_mission     | Start Mission | std_srvs/SetBool                | Signal to take off the device  |
 
 ### Mission srv msg => aerialcore_common/ConfigMission
 
@@ -34,22 +34,22 @@ std_msgs/Float64MultiArray commandParameter   # action value
 bool success
 ```
 
-| variable          | Type            | Description                                                                                                                                                                                 |
-| ----------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| type              | String          | if GPS or rkt                                                                                                                                                                               |
-| waypoint          | Array NavSatFix | waypoint list [latitude, longitude ,altitude ]                                                                                                                                              |
-| radius            | float           | radius in trace Mode                                                                                                                                                                        |
-| maxVel            | float           | Max velocity in m/s                                                                                                                                                                         |
-| idleVel           | float           | Cruising Speed in m/s                                                                                                                                                                       |
-| yaw               | Array float     | list of yaw for each waypoint, value in degrees [-180, 180] with 0 in north.                                                                                                                |
-| gimbalPitch       | Array float     | List of gimbal values for each waypoint , value in degrees [10,-180] with 0 see on front                                                                                                    |
-| speed             | Array float     | List of speed to arrive to waypoint                                                                                                                                                         |
-| yawMode           | int             | Depend of each device                                                                                                                                                                       |
-| TraceMode         | int             | Depend of each device                                                                                                                                                                       |
-| gimbalPitchMode   | int             | Depend of each device                                                                                                                                                                       |
-| finishAction      | int             | Depend of each UAV                                                                                                                                                                          |
-| CommandList       | Array float     | Depend of each UAV , Acciones a realizar al final de la ruta: valor 0: sin accion valor 1: retornar a home valor 2: aterrizaje automatico valor 3: vuelve al punto 0 valor 4: modo infinito |
-| CommandParamenter | Array float     | Depend of each UAV , Acciones a realizar al final de la ruta: valor 0: sin accion valor 1: retornar a home valor 2: aterrizaje automatico valor 3: vuelve al punto 0 valor 4: modo infinito |
+| variable          | Type            | Description                                                                              |
+| ----------------- | --------------- | ---------------------------------------------------------------------------------------- |
+| type              | String          | if GPS or rkt                                                                            |
+| waypoint          | Array NavSatFix | waypoint list [latitude, longitude ,altitude ]                                           |
+| radius            | float           | radius in trace Mode                                                                     |
+| maxVel            | float           | Max velocity in m/s                                                                      |
+| idleVel           | float           | Cruising Speed in m/s                                                                    |
+| yaw               | Array float     | list of yaw for each waypoint, value in degrees [-180, 180] with 0 in north.             |
+| gimbalPitch       | Array float     | List of gimbal values for each waypoint , value in degrees [10,-180] with 0 see on front |
+| speed             | Array float     | List of speed to arrive to waypoint                                                      |
+| yawMode           | int             | Depend of each device                                                                    |
+| TraceMode         | int             | Depend of each device                                                                    |
+| gimbalPitchMode   | int             | Depend of each device                                                                    |
+| finishAction      | int             | Depend of each device                                                                    |
+| CommandList       | Array float     | Depend of each device                                                                    |
+| CommandParamenter | Array float     | Depend of each device                                                                    |
 
 ### mission config for DJI devices
 
@@ -92,11 +92,11 @@ here explain the custom configuration for DJI devices.
 
 This are a matrix with a row for each waypoint and the command action indicate the number of action to do and the command parameter the value of the action .
 
-| actions | Name        | description      |
-| ------- | ----------- | ---------------- |
-| 0       | stay        | no action        |
-| 1       | photo       | simple shot      |
-| 2       | video start | record video     |
-| 3       | video stop  | end record video |
-| 4       | yaw         | craft yaw        |
-| 5       | gimbal      | gimbal pitch     |
+| actions | Name        | description      | parameter   |
+| ------- | ----------- | ---------------- | ----------- |
+| 0       | stay        | no action        | 0           |
+| 1       | photo       | simple shot      | 0           |
+| 2       | video start | record video     | 0           |
+| 3       | video stop  | end record video | 0           |
+| 4       | yaw         | craft yaw        | [-180, 180] |
+| 5       | gimbal      | gimbal pitch     | [10, -180]  |
